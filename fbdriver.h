@@ -48,10 +48,14 @@ void fb_move_cursor(unsigned short pos);
   */
 void fb_write_cell(unsigned int i, char c[], unsigned char fg, unsigned char bg);
 
-void fb_clear(unsigned char color);
+void fb_clear();
 
-int write(char* buf, unsigned int len);
+int fb_write(char* buf, unsigned int len);
 
-int writeColor(char* buf, unsigned int len, unsigned char fg, unsigned char bg);
+int fb_writeColor(char* buf, unsigned int len, unsigned char fg, unsigned char bg);
+
+void fb_lineBreak();
+
+extern unsigned int CONSOLE_BACKGROUND_COLOR;
 
 #endif /* INCLUDE_IO_H */

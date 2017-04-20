@@ -22,7 +22,8 @@ minios.iso: kernel.elf
 								-quiet                          \
 								-boot-info-table                \
 								-o minios.iso                   \
-								iso
+								iso								
+								gtags
 
 run: minios.iso
 		bochs -f bochsrc.txt -q

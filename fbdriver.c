@@ -1,6 +1,7 @@
 #include "fbdriver.h"
 
 static unsigned int cur = 0;
+unsigned int CONSOLE_BACKGROUND_COLOR = FB_COLOR_BLACK;
 
 void fb_move_cursor(unsigned short pos)
 {
@@ -39,23 +40,31 @@ unsigned int cursor_target(unsigned int newVal) {
   return newVal;
 }
 
-int write(char* buf, unsigned int len) {
+int fb_write(char* buf, unsigned int len) {
   char *fb = (char *) 0x000B8000;
 
   for (unsigned int count = 0; count < len; count++) {
     char key = buf[count];
-    fb[cur * 2] = key;
-    fb[cur * 2 + 1] = ((FB_COLOR_BLACK & 0x0F) << 4) | (FB_COLOR_WHITE & 0x0F);
 
-    if (count != len-1) {
-      unsigned int tc = cursor_target(cur+1);
-      fb_move_cursor(tc);
-      cur = tc;
+    if (key == '\n')
+    {
+      fb_lineBreak();
+    }
+    else 
+    {
+      fb[cur * 2] = key;
+      fb[cur * 2 + 1] = ((CONSOLE_BACKGROUND_COLOR & 0x0F) << 4) | (FB_COLOR_WHITE & 0x0F);
+
+      if (count != len-1) {
+        unsigned int tc = cursor_target(cur+1);
+        fb_move_cursor(tc);
+        cur = tc;
+      }
     }
   }
   
   fb[cur * 2] = ' ';
-  fb[cur * 2 + 1] = ((FB_COLOR_BLACK & 0x0F) << 4) | (FB_COLOR_WHITE & 0x0F);
+  fb[cur * 2 + 1] = ((CONSOLE_BACKGROUND_COLOR & 0x0F) << 4) | (FB_COLOR_WHITE & 0x0F);
   unsigned int tc = cursor_target(cur);
   fb_move_cursor(tc);
   cur = tc;
@@ -63,24 +72,32 @@ int write(char* buf, unsigned int len) {
   return cur;
 }
 
-int writeColor(char* buf, unsigned int len, unsigned char fg, unsigned char bg) {
+int fb_writeColor(char* buf, unsigned int len, unsigned char fg, unsigned char bg) {
   char *fb = (char *) 0x000B8000;
 
-  for (unsigned int count = 0; count < len; count++) {
+  for (unsigned int count = 0; count < len; count++) 
+  {
     char key = buf[count];
-    fb[cur * 2] = key;
-    fb[cur * 2 + 1] = ((bg & 0x0F) << 4) | (fg & 0x0F);
 
-    if (count != len-1) {
-      unsigned int tc = cursor_target(cur+1);
-      fb_move_cursor(tc);
-      cur = tc;
+    if (key == '\n')
+    {
+      fb_lineBreak();
     }
+    else
+    {
+      fb[cur * 2] = key;
+      fb[cur * 2 + 1] = ((bg & 0x0F) << 4) | (fg & 0x0F);
 
+      if (count != len-1) {
+        unsigned int tc = cursor_target(cur+1);
+        fb_move_cursor(tc);
+        cur = tc;
+      }
+    }
   }
 
   fb[cur * 2] = ' ';
-  fb[cur * 2 + 1] = ((FB_COLOR_BLACK & 0x0F) << 4) | (FB_COLOR_WHITE & 0x0F);
+  fb[cur * 2 + 1] = ((CONSOLE_BACKGROUND_COLOR & 0x0F) << 4) | (FB_COLOR_WHITE & 0x0F);
   unsigned int tc = cursor_target(cur);
   fb_move_cursor(tc);
   cur = tc;
@@ -88,14 +105,26 @@ int writeColor(char* buf, unsigned int len, unsigned char fg, unsigned char bg) 
   return cur;
 }
 
-void fb_clear(unsigned char color) {
+void fb_clear() {
   char clArr[FB_ROWS*FB_COLUMNS];
 
   for (int i = 0; i < FB_ROWS*FB_COLUMNS; i++){
     clArr[i] = ' ';
   }
 
-  writeColor(clArr, FB_ROWS*FB_COLUMNS, FB_COLOR_WHITE, color);
+  fb_writeColor(clArr, FB_ROWS*FB_COLUMNS, FB_COLOR_WHITE, CONSOLE_BACKGROUND_COLOR);
   cur = 0;
   fb_move_cursor(0);
+}
+
+void fb_lineBreak() {
+  unsigned int cToEnd = FB_COLUMNS - cur + 1;
+
+  char chArr[cToEnd];
+  for (unsigned int i = 0; i < cToEnd; i++) 
+  {
+    chArr[i] = ' ';
+  }
+
+  fb_writeColor(chArr, cToEnd, FB_COLOR_WHITE, CONSOLE_BACKGROUND_COLOR);
 }
