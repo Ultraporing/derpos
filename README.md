@@ -6,6 +6,7 @@
 - A GCC compiler, NASM and be able to execute makefiles
 
 ### Features:
-- Can write text to screen
-- Screen clear
+- Can write text to screen, handles line breaks
+- Screen clear to color
+- Console background color
 - More in development
