@@ -31,14 +31,12 @@ void fb_write_cell(unsigned int i, char c[], unsigned char fg, unsigned char bg)
     }
 }
 
-void fb_clear(unsigned char color) {
-  char clArr[FB_ROWS*FB_COLUMNS];
-
-  for (int i = 0; i < FB_ROWS*FB_COLUMNS; i++){
-    clArr[i] = ' ';
+unsigned int cursor_target(unsigned int newVal) {
+  if (newVal >= FB_ROWS*FB_COLUMNS) {
+    return newVal - FB_ROWS*FB_COLUMNS;
   }
-
-  fb_write_cell(0, clArr, color, color);
+  
+  return newVal;
 }
 
 int write(char* buf, unsigned int len) {
@@ -50,13 +48,17 @@ int write(char* buf, unsigned int len) {
     fb[cur * 2 + 1] = ((FB_COLOR_BLACK & 0x0F) << 4) | (FB_COLOR_WHITE & 0x0F);
 
     if (count != len-1) {
-      fb_move_cursor(cur++);
+      unsigned int tc = cursor_target(cur+1);
+      fb_move_cursor(tc);
+      cur = tc;
     }
   }
   
   fb[cur * 2] = ' ';
   fb[cur * 2 + 1] = ((FB_COLOR_BLACK & 0x0F) << 4) | (FB_COLOR_WHITE & 0x0F);
-  fb_move_cursor(cur);
+  unsigned int tc = cursor_target(cur);
+  fb_move_cursor(tc);
+  cur = tc;
 
   return cur;
 }
@@ -70,14 +72,30 @@ int writeColor(char* buf, unsigned int len, unsigned char fg, unsigned char bg) 
     fb[cur * 2 + 1] = ((bg & 0x0F) << 4) | (fg & 0x0F);
 
     if (count != len-1) {
-      fb_move_cursor(cur++);
+      unsigned int tc = cursor_target(cur+1);
+      fb_move_cursor(tc);
+      cur = tc;
     }
 
   }
 
   fb[cur * 2] = ' ';
   fb[cur * 2 + 1] = ((FB_COLOR_BLACK & 0x0F) << 4) | (FB_COLOR_WHITE & 0x0F);
-  fb_move_cursor(cur);
+  unsigned int tc = cursor_target(cur);
+  fb_move_cursor(tc);
+  cur = tc;
 
   return cur;
+}
+
+void fb_clear(unsigned char color) {
+  char clArr[FB_ROWS*FB_COLUMNS];
+
+  for (int i = 0; i < FB_ROWS*FB_COLUMNS; i++){
+    clArr[i] = ' ';
+  }
+
+  writeColor(clArr, FB_ROWS*FB_COLUMNS, FB_COLOR_WHITE, color);
+  cur = 0;
+  fb_move_cursor(0);
 }
