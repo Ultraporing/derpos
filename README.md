@@ -4,6 +4,7 @@
 ### Prerequisites:
 - Bochs
 - A GCC compiler, NASM and be able to execute makefiles
+- global-6.4
 
 ### Features:
 - Can write text to screen, handles line breaks
