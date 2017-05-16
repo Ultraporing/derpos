@@ -32,6 +32,10 @@ sudo apt-get -y install python-pip
  
 echo "install pygments..."
 sudo pip install pygments==1.6
+
+echo "Cleanup..."
+sudo rm -rf global-6.4
+sudo rm -rf global-6.4.tar.gz
  
 echo "$0 done."
 exit 0
