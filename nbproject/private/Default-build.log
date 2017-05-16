@@ -1,0 +1,6 @@
+nasm -f elf loader.s -o loader.o
+nasm -f elf io.s -o io.o
+gcc -m32 -nostdlib -nostdinc -fno-builtin -fno-stack-protector -nostartfiles -nodefaultlibs -Wall -Wextra -Werror -c  kmain.c -o kmain.o
+gcc -m32 -nostdlib -nostdinc -fno-builtin -fno-stack-protector -nostartfiles -nodefaultlibs -Wall -Wextra -Werror -c  fbdriver.c -o fbdriver.o
+gcc -m32 -nostdlib -nostdinc -fno-builtin -fno-stack-protector -nostartfiles -nodefaultlibs -Wall -Wextra -Werror -c  ioports.c -o ioports.o
+ld -T link.ld -melf_i386 loader.o io.o kmain.o fbdriver.o ioports.o -o kernel.elf
